@@ -1,0 +1,64 @@
+ Error: creating S3 Bucket (dev-s3-us-west-1) Versioning: operation error S3: PutBucketVersioning, https response error StatusCode: 307, RequestID: 85CYJPRGGW1JG8Q1, HostID: 6dC2JNb4ylze9qV3rUIAagni3oXUY3i7BZndUN2AYQjwJB3XLf5e7quX7ER4v8l8NhnXqTLdeD7KAovYZayXv60h+TrghLwKjtH8sNx8Xec=, api error TemporaryRedirect: Please re-send this request to the specified temporary endpoint. Continue to use the original request endpoint for future requests.       
+│
+│   with aws_s3_bucket_versioning.versioning_sr,
+│   on s3.tf line 76, in resource "aws_s3_bucket_versioning" "versioning_sr":
+│   76: resource "aws_s3_bucket_versioning" "versioning_sr" {
+
+sol: - Your aws_s3_bucket_acl and aws_s3_bucket_ownership_controls reference pr_s3, but versioning_sr relies on sr_s3.
+- If sr_s3 is meant to be the bucket you're configuring, ensure references are correct.
+
+
+Error: creating S3 Bucket (dev-s3crr-us-east-1) ACL: operation error S3: PutBucketAcl, https response error StatusCode: 400, RequestID: M5HKBB28KF2E04HF, HostID: Nq0OqJ3CHC78UqmGT1iFyzZvTTs8kGcceaUHnzn1tp3SXFbv59rj4zohmFVzTBOPeT2XPg1d+ATiCEglEPStqaReYomWp2/W, api error AccessControlListNotSupported: The bucket does not allow ACLs      
+│
+│   with aws_s3_bucket_acl.pr_acl,
+│   on s3.tf line 25, in resource "aws_s3_bucket_acl" "pr_acl":
+│   25: resource "aws_s3_bucket_acl" "pr_acl" {
+│
+Sol: ACL Configuration Error
+- AWS no longer supports ACLs for buckets with BucketOwnerEnforced ownership control.
+- You have aws_s3_bucket_ownership_controls set to "BucketOwnerEnforced", but you're also defining an ACL (aws_s3_bucket_acl), which is unnecessary.
+- Fix: Remove the aws_s3_bucket_acl resources (pr_acl and sr_acl).
+
+╷
+│ Error: creating S3 Bucket (dev-s3crr-us-east-1) Replication Configuration: operation error S3: PutBucketReplication, https response error StatusCode: 400, RequestID: 4CR0Q7M70311JW1K, HostID: MTLL/RIGpSRvfi6XTjvHf7AEUcaBMf2RZDikmeSGe/xbqm7YoauWJLaMIqLfJcckb1cQg4NCfFU=, api error InvalidRequest: Destination bucket must have versioning enabled.
+│
+│   with aws_s3_bucket_replication_configuration.replication,
+│   on s3.tf line 43, in resource "aws_s3_bucket_replication_configuration" "replication":
+│   43: resource "aws_s3_bucket_replication_configuration" "replication" {
+│
+sol: Replication configuration references the destination bucket (aws_s3_bucket.sr_s3), but versioning must be enabled for the destination bucket before setting up replication.
+- I see you've enabled versioning (aws_s3_bucket_versioning.versioning_sr), but ensure that the bucket exists before applying replication.
+- Fix: Add an explicit depends_on in replication configuration
+
+
+│ Error: creating S3 Bucket (dev-s3crr-us-west-1) Versioning: operation error S3: PutBucketVersioning, https response error StatusCode: 307, RequestID: M5HRACB72917Y1J9, HostID: OHsLouMzMVB/aR4c2/QVmzHrpJruQGR/r4+J6vNsyJC9cd0dfWKyeiDMhAYzuY9bla6IjJUBtbVGSe2c9Dy0eXUB3pXGNTXc, api error TemporaryRedirect: Please re-send this request to the specified temporary endpoint. Continue to use the original request endpoint for future requests.
+│
+│   with aws_s3_bucket_versioning.versioning_sr,
+│   on s3.tf line 76, in resource "aws_s3_bucket_versioning" "versioning_sr":
+│   76: resource "aws_s3_bucket_versioning" "versioning_sr" {
+
+
+│ Error: creating S3 Bucket (dev-s3crr-us-west-1) Ownership Controls: operation error S3: PutBucketOwnershipControls, https response error StatusCode: 307, RequestID: M5HJMECYQAN42N53, HostID: Qqjk+a0Kci7UGoC/Xy/yGm9u767spXnxm9mF8utt/LPN3XwFSQPaTUEnac7zQ2NA8eBY+v+b3jdrrRVk45ycb5yir7iwzCS7, api error TemporaryRedirect: Please re-send this request to the specified temporary endpoint. Continue to use the original request endpoint for future requests. 
+│
+│   with aws_s3_bucket_ownership_controls.sr_owner,
+│   on s3.tf line 83, in resource "aws_s3_bucket_ownership_controls" "sr_owner":
+│   83: resource "aws_s3_bucket_ownership_controls" "sr_owner" {
+│
+╷
+│ Error: creating S3 Bucket (dev-s3crr-us-west-1) Server-side Encryption Configuration: operation error S3: PutBucketEncryption, https response error StatusCode: 307, RequestID: M5HJEC0S2N6YFMPD, HostID: Fd/SE+iWqICzItnKUv8FQip1Z5iAFGRoQVuIpM933hYjU73p7uDutwJMIDjk29bN8EYAjDViIHKbYa1vyq+siQzM5QlRAkEC, api error TemporaryRedirect: Please re-send this request to the specified temporary endpoint. Continue to use the original request endpoint for future requests.
+│
+│   with aws_s3_bucket_server_side_encryption_configuration.sse_sr,
+│   on s3.tf line 97, in resource "aws_s3_bucket_server_side_encryption_configuration" "sse_sr":
+│   97: resource "aws_s3_bucket_server_side_encryption_configuration" "sse_sr" {
+
+sol for all 3: Issue> 307 TemporaryRedirect, Fix> Add provider = aws.<alias> to all resources
+
+│ Error: creating S3 Bucket (dev-s3crr-us-east-1) Replication Configuration: operation error S3: PutBucketReplication, https response error StatusCode: 400, RequestID: QKT1FTQVJTH9NDQH, HostID: gf2Sf4FlExz9oDyZzmnyAYLz5z9aS42WmGioeE1Qhy59iaNoO75bXovFJVj2azVQ/BIp/T5O+mfmgx/Y/gZ8/lDR6hZ91wWqOGruDgQKk9E=, api error MalformedXML: The XML you provided was not well-formed or did not validate against our published schema
+│
+│   with aws_s3_bucket_replication_configuration.replication,
+│   on s3.tf line 46, in resource "aws_s3_bucket_replication_configuration" "replication":
+│   46: resource "aws_s3_bucket_replication_configuration" "replication" {
+
+sol: ##MalformedXML> The XML you provided was not well-formed or did not validate against our published schema
+occurs when the aws_s3_bucket_replication_configuration block is missing required fields or is using an invalid structure for the replication configuration schema.
+Update your replication rule to include at least an empty filter block (which is required for the rule to be valid) missing filter or prefix configuration, which is mandatory

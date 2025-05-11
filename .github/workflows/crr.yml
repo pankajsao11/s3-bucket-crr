@@ -19,7 +19,7 @@ jobs:
     name: Terraform ${{ github.event.inputs.action || 'apply'}}
     runs-on: ubuntu-latest
     env:
-      AWS_Region: us-east-1
+      AWS_REGION: us-east-1
 
     steps:
       - name: Checkout repository

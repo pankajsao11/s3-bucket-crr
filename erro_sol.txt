@@ -62,3 +62,16 @@ sol for all 3: Issue> 307 TemporaryRedirect, Fix> Add provider = aws.<alias> to 
 sol: ##MalformedXML> The XML you provided was not well-formed or did not validate against our published schema
 occurs when the aws_s3_bucket_replication_configuration block is missing required fields or is using an invalid structure for the replication configuration schema.
 Update your replication rule to include at least an empty filter block (which is required for the rule to be valid) missing filter or prefix configuration, which is mandatory
+
+
+NOTE: IAM Policy should be created properly with all the required permissions and actions else it won't replicate the objects. 
+##github action issues
+1. apply and destroy both can't run in single workflow :-
+
+I'm using single github action workflow for apply and destroy, but once it's applied and i'm trying to destroy using destroy option it says:
+
+No changes. No objects need to be destroyed. Either you have not created any objects yet or the existing objects were already deleted outside of Terraform.
+##sol: GitHub Actions runners are ephemeral – they get destroyed after each workflow run. So, unless you're saving and restoring the Terraform state (terraform.tfstate and .terraform/) between runs, Terraform will always start with a fresh, empty state.
+
+That’s why on destroy it says: No changes. No objects need to be destroyed. Because from its perspective, nothing was ever created.
+To make apply/destroy work in separate runs: Use an AWS S3 bucket (or Terraform Cloud/Backend like remote) to store your state:

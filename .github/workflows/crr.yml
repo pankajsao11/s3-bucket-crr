@@ -36,6 +36,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+          
+      #Download state before destroy
+      - name: Download Terraform state Artifact
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-state
 
       - name: Initialize Terraform
         run: terraform init
@@ -54,6 +61,16 @@ jobs:
         if: ${{ github.event.inputs.action == 'apply' }}
         run: terraform apply -auto-approve tfplan
 
+      # Save state after apply
+      - name: Upload Terraform state artifact
+        if: ${{ github.event.inputs.action == 'apply' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-state
+          path: |
+            terraform.tfstate
+            .terraform/
+            
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         run: terraform destroy -auto-approve

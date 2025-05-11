@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "pr_s3" {
 
 resource "aws_s3_bucket_versioning" "versioning_pr" {
   provider = aws.primary
-  bucket = aws_s3_bucket.pr_s3.id
+  bucket   = aws_s3_bucket.pr_s3.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -18,7 +18,7 @@ resource "aws_s3_bucket_versioning" "versioning_pr" {
 
 resource "aws_s3_bucket_ownership_controls" "pr_owner" {
   provider = aws.primary
-  bucket = aws_s3_bucket.pr_s3.id
+  bucket   = aws_s3_bucket.pr_s3.id
   rule {
     object_ownership = "BucketOwnerEnforced"
   }
@@ -26,7 +26,7 @@ resource "aws_s3_bucket_ownership_controls" "pr_owner" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "sse_pr" {
   provider = aws.primary
-  bucket = aws_s3_bucket.pr_s3.id
+  bucket   = aws_s3_bucket.pr_s3.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -36,7 +36,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "sse_pr" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "replication" {
-  provider   = aws.primary
+  provider = aws.primary
   depends_on = [
     aws_s3_bucket_versioning.versioning_pr,
     aws_s3_bucket_versioning.versioning_sr,
@@ -77,7 +77,7 @@ resource "aws_s3_bucket" "sr_s3" {
 
 resource "aws_s3_bucket_versioning" "versioning_sr" {
   provider = aws.secondary
-  bucket = aws_s3_bucket.sr_s3.id
+  bucket   = aws_s3_bucket.sr_s3.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -85,7 +85,7 @@ resource "aws_s3_bucket_versioning" "versioning_sr" {
 
 resource "aws_s3_bucket_ownership_controls" "sr_owner" {
   provider = aws.secondary
-  bucket = aws_s3_bucket.sr_s3.id
+  bucket   = aws_s3_bucket.sr_s3.id
   rule {
     object_ownership = "BucketOwnerEnforced"
   }
@@ -93,7 +93,7 @@ resource "aws_s3_bucket_ownership_controls" "sr_owner" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "sse_sr" {
   provider = aws.secondary
-  bucket = aws_s3_bucket.sr_s3.id
+  bucket   = aws_s3_bucket.sr_s3.id
 
   rule {
     apply_server_side_encryption_by_default {

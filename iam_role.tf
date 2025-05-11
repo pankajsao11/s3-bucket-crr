@@ -19,19 +19,29 @@ resource "aws_iam_policy" "replication_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      # Allow source bucket listing and reading replication configuration
       {
         Effect = "Allow"
         Action = [
-          "s3:GetObjectVersionForReplication",
-          "s3:GetObjectVersionAcl",
-          "s3:GetObjectVersionTagging"
+          "s3:GetReplicationConfiguration",
+          "s3:ListBucket"
         ]
         Resource = [
           "${aws_s3_bucket.pr_s3.arn}",
           "${aws_s3_bucket.pr_s3.arn}/*"
         ]
       },
-
+      # Allow reading object versions from source bucket
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObjectVersion",
+          "s3:GetObjectVersionAcl",
+          "s3:GetObjectVersionTagging"
+        ]
+        Resource = "${aws_s3_bucket.pr_s3.arn}/*"
+      },
+      # Allow replicating objects into destination bucket
       {
         Effect = "Allow"
         Action = [
@@ -41,8 +51,8 @@ resource "aws_iam_policy" "replication_policy" {
           "s3:GetObjectVersionTagging"
         ]
         Resource = [
-          "${aws_s3_bucket.pr_s3.arn}",
-          "${aws_s3_bucket.pr_s3.arn}/*"
+          "${aws_s3_bucket.sr_s3.arn}",
+          "${aws_s3_bucket.sr_s3.arn}/*"
         ]
       }
     ]

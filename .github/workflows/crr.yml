@@ -40,7 +40,7 @@ jobs:
       #Download state before destroy
       - name: Download Terraform state Artifact
         if: ${{ github.event.inputs.action == 'destroy' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2
         with:
           name: terraform-state
 
@@ -64,7 +64,7 @@ jobs:
       # Save state after apply
       - name: Upload Terraform state artifact
         if: ${{ github.event.inputs.action == 'apply' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: terraform-state
           path: |

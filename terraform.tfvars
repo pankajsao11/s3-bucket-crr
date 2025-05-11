@@ -1,0 +1,5 @@
+primary_region   = "us-east-1"
+secondary_region = "us-west-1"
+bucket_name      = "dev-s3crr"
+iam_role         = "s3-replication"
+iam_policy       = "s3-replication-policy"
